@@ -28,6 +28,7 @@
 
 using namespace std;
 
+// this kernel takes ~45 FLOPS 
 const char * stl_cl_vertexTransform_kernel_source  =
 "__kernel                                                   "
 "\nvoid _kVertexTransform(const __global float *xMat,    "
@@ -62,7 +63,9 @@ const char * stl_cl_vertexTransform_kernel_source  =
 "\n}                                                                                    "
 ;
 
-void stlclVertexTransform(float *matTransform, std::vector<float> &verticies, float *tempVBuff)
+void stlclVertexTransform(float *matTransform, 
+    std::vector<float> &verticies, 
+    float *tempVBuff)
 {
     size_t matBytes = sizeof(float)*12;
     unsigned int nVerticies = verticies.size();

@@ -111,7 +111,7 @@ void stlclComputeNormal(float *xform, std::vector<float> &verticies, float *norm
     cli->status = clEnqueueWriteBuffer(
         cli->cmdQueue, 
         bufferA, 
-        CL_FALSE, 
+        CL_FALSE,       //non-blocking buffer to device
         0, 
         vertexBytes,                         
         verticies.data(), 
@@ -189,6 +189,7 @@ void stlclComputeNormal(float *xform, std::vector<float> &verticies, float *norm
         0, 
         NULL, 
         NULL);
+
 
     // Free OpenCL resources
     cliRelease(cli);
