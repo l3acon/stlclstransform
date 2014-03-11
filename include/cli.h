@@ -3,7 +3,7 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <string>
+#include <string.h>
 
 // OpenCL includes
 #ifdef __APPLE__

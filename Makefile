@@ -18,12 +18,10 @@ UNAME_S := $(shell uname -s)
 SRCEXT := cpp
 HDRPAT := -name *.h
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
-#LIBDIR := /usr/local/include
 HEADERS := $(shell find $(SRCDIR) -type f $(HDRPAT))
 ALLDEP += $(HEADERS)
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 LIB := -lm
-#FW := -framework OpenCL
 INC := -I include -I$(LIBDIR)
 
 all: $(OBJECTS)
