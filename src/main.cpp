@@ -62,9 +62,8 @@ int main()
     //{
     //    printf("n:%d xf1:%f  xf2:%f\n", i, vBuffer[i], verticies[i] );
     //}
-    printf("%s\n", "OpenCL success?");
 
-    printf("Error in: %f",(stlVerifyTransform(xformMat, vBuffer, verticies.data(), verticies.size()/9 )));
+    //printf("Error in: %f",(stlVerifyTransform(xformMat, vBuffer, verticies.data(), verticies.size()/9 )));
 
     return 0;
 }

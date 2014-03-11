@@ -4,15 +4,26 @@ ALLDEPS :=
 SRCDIR := src
 BUILDDIR := build
 
+# edit this for even more portablility 
+UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Linux)
+        FW := -lOpenCL
+        LIBDIR :=/opt/AMDAPP/include/
+    endif
+    ifeq ($(UNAME_S),Darwin)
+        FW := -framework OpenCL
+        LIBDIR := /usr/local/include
+    endif
+
 SRCEXT := cpp
 HDRPAT := -name *.h
 SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
-LIBDIR := /usr/local/include
+#LIBDIR := /usr/local/include
 HEADERS := $(shell find $(SRCDIR) -type f $(HDRPAT))
 ALLDEP += $(HEADERS)
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 LIB := -lm
-FW := -framework OpenCL
+#FW := -framework OpenCL
 INC := -I include -I$(LIBDIR)
 
 all: $(OBJECTS)
