@@ -1,9 +1,4 @@
 
-// MAC & Intel:
-//clang -framework OpenCL *.c
-//Linux & AMD: 
-//gcc -std=c11 -I /opt/AMDAPP/include/ *.c -lOpenCL
-
 //test in GLGraphicWidget.cpp
 //glMultMatrixd(m_viewpoint.transformMatrix().data())
 

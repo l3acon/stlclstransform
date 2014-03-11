@@ -1,19 +1,9 @@
 
-// MAC & Intel:
-//clang -framework OpenCL *.c
-//Linux & AMD: 
-//gcc -std=c11 -I /opt/AMDAPP/include/ *.c -lOpenCL
-
-//test in GLGraphicWidget.cpp
-//glMultMatrixd(m_viewpoint.transformMatrix().data())
-
 // System includes
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
 #include <cmath>
-#include <iostream>
-#include <fstream>
 
 #include "stl_cl_vertexTransform.h"
 #include "stl_cl_computeNormal.h"
