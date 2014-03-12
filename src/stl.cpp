@@ -8,7 +8,8 @@
 
 #include "stl.h"
 
-int stlRead(const char* stlFile, 
+int stlRead(
+    const char* stlFile, 
     std::vector<float> &verticies , 
     std::vector<float> &normals)
 {
@@ -40,12 +41,15 @@ int stlRead(const char* stlFile,
     return 0;
 }
 
-int stlWrite(const char* stlFile, 
+int stlWrite(
+    const char* stlFile, 
     std::vector<float> &verticies, 
     std::vector<float> &normals);
 
-float stlVerifyTransform(const float* xMat, 
-    float* v, float* xformedv, 
+float stlVerifyTransform(
+    const float* xMat, 
+    float* v, 
+    float* xformedv, 
     unsigned int nFaces)
 {
     float verto[9];

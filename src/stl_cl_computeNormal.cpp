@@ -6,6 +6,7 @@
 #include <cmath>
 
 #include "cli.h"
+#include "stl_cl_computeNormal.h"
 
 // OpenCL includes
 #ifdef __APPLE__
@@ -18,9 +19,11 @@
 
 using namespace std;
 
+// this kernel takes ~16 FLOPS
 const char * stl_computeNormal_kernel_source  =
 "__kernel                                               "
-"\nvoid _kComputeNormal(const __global float *vi,       "
+"\nvoid _kComputeNormal(                        "
+"\n                __global float *vi,          "
 "\n            __global float *verto)                   "
 "\n{                                                    "
 "\n                                                     "
@@ -28,6 +31,7 @@ const char * stl_computeNormal_kernel_source  =
 "\n    unsigned int ii = 9*get_global_id(0);            "
 "\n    unsigned int io = 3*get_global_id(0);            "
 "\n                                                     "
+"\n    //fairly sure this actually works                "
 "\n    float t[4];                                      "
 "\n    t[0] = (vi[ii+4]-vi[ii+3])*(vi[ii+8]-vi[ii+6])   "
             " - (vi[ii+7]-vi[ii+6])*(vi[ii+5]-vi[ii+3]) "
@@ -43,7 +47,10 @@ const char * stl_computeNormal_kernel_source  =
 "\n}                                                    "
 ;
 
-void stlclComputeNormal(float *xform, std::vector<float> &verticies, float *normalBuffer)
+cl_int stlclComputeNormal(
+    std::vector<float> &verticies, 
+    float *normalBuffer, 
+    std::vector<cl_int> &cliStati)
 {
     unsigned int nVerticies = verticies.size();
 
@@ -75,6 +82,7 @@ void stlclComputeNormal(float *xform, std::vector<float> &verticies, float *norm
         vertexBytes, 
         NULL, 
         &cli->status);
+    cliStati.push_back(cli->status);
 
     // Use clCreateBuffer() to create a buffer object (d_C) 
     // with enough space to hold the output data
@@ -84,6 +92,8 @@ void stlclComputeNormal(float *xform, std::vector<float> &verticies, float *norm
         normalBytes, 
         NULL, 
         &cli->status);
+    cliStati.push_back(cli->status);
+
         
     // -- prototype copied here for reference --
     //cl_int clEnqueueWriteBuffer (   cl_command_queue command_queue,
@@ -109,7 +119,8 @@ void stlclComputeNormal(float *xform, std::vector<float> &verticies, float *norm
         0, 
         NULL, 
         NULL);
-        
+    cliStati.push_back(cli->status);
+
     // Associate the input and output buffers with the 
     // kernel 
     // using clSetKernelArg()
@@ -119,17 +130,23 @@ void stlclComputeNormal(float *xform, std::vector<float> &verticies, float *norm
         sizeof(cl_mem), 
         &bufferA);
 
+    cliStati.push_back(cli->status);
+
+
     cli->status = clSetKernelArg(
         cli->kernel, 
-        2, 
+        1, 
         sizeof(cl_mem), 
         &bufferC);
 
-    if( fmod(nVerticies, 9.0)  != 0 )
-    {
-        printf("Worksize Error\n");
-        exit(1); //change this
-    }
+    cliStati.push_back(cli->status);
+
+
+    //if( fmod(nVerticies, 9.0)  != 0 )
+    //{
+    //    printf("Worksize Error\n");
+    //    exit(1); //change this
+    //}
 
     // Define an index space (global work size) of work 
     // items for 
@@ -156,6 +173,8 @@ void stlclComputeNormal(float *xform, std::vector<float> &verticies, float *norm
         0, 
         NULL, 
         NULL);
+
+    cliStati.push_back(cli->status);
 
     // STEP 12: Read the output buffer back to the host
     
@@ -191,5 +210,5 @@ void stlclComputeNormal(float *xform, std::vector<float> &verticies, float *norm
     //free(A);
     //free(B);
     //free(C);
-    return;
+    return cli->status;
 }

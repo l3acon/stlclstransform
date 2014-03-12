@@ -8,7 +8,6 @@
 #include <cmath>
 
 #include "cli.h"
-#include "stl_cl_vertexTransform.h"
 
 // OpenCL includes
 #ifdef __APPLE__
@@ -21,9 +20,11 @@
 
 
 
-extern void stlclVertexTransform(float *xform, 
+extern cl_int stlclVertexTransform(
+	float *matTransform, 
 	std::vector<float> &verticies, 
-	float *tempVBuff);
+	float *tempVBuff,
+	std::vector<cl_int> &cliStati);
 
 
 #endif

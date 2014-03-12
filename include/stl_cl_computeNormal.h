@@ -1,9 +1,5 @@
 #ifndef STL_CL_cNORM
 #define STL_CL_cNORM
-// MAC & Intel:
-//clang -framework OpenCL *.c
-//Linux & AMD: 
-//gcc -std=c11 -I /opt/AMDAPP/include/ *.c -lOpenCL
 
 //test in GLGraphicWidget.cpp
 //glMultMatrixd(m_viewpoint.transformMatrix().data())
@@ -26,8 +22,9 @@
 #error Platform not supported
 #endif
 
-using namespace std;
-
-void stlclComputeNormal(float *xform, std::vector<float> &verticies, float *tempVBuff);
+extern cl_int stlclComputeNormal(
+	std::vector<float> &verticies, 
+	float *tempVBuff,
+	std::vector<cl_int> &cliStati);
 
 #endif

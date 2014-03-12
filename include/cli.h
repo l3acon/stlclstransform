@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <vector>
 #include <string.h>
 
 // OpenCL includes
@@ -18,6 +19,7 @@ typedef struct cli_s
 {
 	// internal status to check the output of each API call
     cl_int status;
+    //std::vector<cl_int> status;
     //initialize our data we're keeping track of
     // used for  1: Discover and initialize the platforms
     cl_uint numPlatforms;
@@ -44,10 +46,15 @@ typedef struct cli_s
 
 extern CLI* cliInitialize();
 
-extern void cliBuild (CLI* cli, const char* programSource, const char * kernel_name);
+extern void cliBuild (
+    CLI* cli, 
+    const char* programSource, 
+    const char * kernel_name);
 
 extern void cliRelease(CLI* cli);
 
-extern void clStatus(cl_int err, char*stat);
+extern void cliStatus(const cl_int err, char*stat);
+
+extern void PrintCLIStatus(cl_int err);
 
 #endif

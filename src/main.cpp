@@ -8,7 +8,7 @@
 #include "stl_cl_vertexTransform.h"
 #include "stl_cl_computeNormal.h"
 #include "stl.h"
-
+#include "cli.h"
 
 using namespace std;
 
@@ -44,9 +44,11 @@ int main()
     //    printf("%d %f\n", i, verticies[i] );
     //}
 
-
+    std::vector<cl_int> errors;
     vBuffer = (float*) malloc(sizeof(float)*verticies.size());
-    stlclVertexTransform(xformMat, verticies, vBuffer);
+    if( stlclVertexTransform(xformMat, verticies, vBuffer, errors))
+        for( std::vector<cl_int>::const_iterator i = errors.begin(); i != errors.end(); ++i)
+            PrintCLIStatus(*i);
 
     //for (int i = 0; i < verticies.size(); ++i)
     //{
