@@ -10,7 +10,7 @@
 
 int stlRead(
     const char* stlFile, 
-    std::vector<float> &verticies , 
+    std::vector<float> &verticies, 
     std::vector<float> &normals)
 {
     float facet[12];

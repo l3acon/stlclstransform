@@ -19,6 +19,8 @@ extern cl_int stlclComputeNormal(
 
 int main() 
 {
+    const char* stlFile = "Ring.stl";
+
     //use this vector for erros
     std::vector<cl_int> errors;
 
@@ -36,19 +38,16 @@ int main()
     for (int i = 0; i < 12; ++i)
         matTransform[i] = i;
 
-    const char* stlFile = "Ring.stl";
     //file stuff
     if(stlRead(stlFile, verticies, normals))
     {
-        cout<<"ERROR: reading file"<<endl;
+        std::cout<<"ERROR: reading file"<<std::endl;
         return 1;
     }
 
     //check sanity for verticies and normals
     if( fmod(verticies.size(),9.0) !=  0 || fmod(normals.size(),3.0) != 0 )
     {
-        cout<< verticies.size()<<endl;
-        cout<< normals.size()<<endl;
         cout<<"ERROR: verticies and normals don't make sense up"<<endl;
         return 1;
     }
