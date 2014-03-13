@@ -49,7 +49,7 @@ CLI * cliInitialize()
     // Allocate enough space for each device
     cli->devices = 
         (cl_device_id*)malloc(
-            cli->numDevices*sizeof(cl_device_id));
+            cli->numDevices * sizeof(cl_device_id));
 
     // Fill in devices with clGetDeviceIDs()
     cli->status = clGetDeviceIDs(
