@@ -73,7 +73,7 @@ int main()
     {
         for( std::vector<cl_int>::const_iterator i = errors.begin(); i != errors.end(); ++i)
         {
-            printf("clComputeNormal:");
+            printf("clComputeNormal: ");
             PrintCLIStatus(*i);
         }
     }
