@@ -24,7 +24,7 @@
 
 extern cl_int stlclComputeNormal(
 	std::vector<float> &verticies, 
-	float *tempVBuff,
+	float *normalBuffer,
 	std::vector<cl_int> &cliStati);
 
 #endif

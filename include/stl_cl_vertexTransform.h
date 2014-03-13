@@ -23,7 +23,7 @@
 extern cl_int stlclVertexTransform(
 	float *matTransform, 
 	std::vector<float> &verticies, 
-	float *tempVBuff,
+	float *vertexBuffer,
 	std::vector<cl_int> &cliStati);
 
 

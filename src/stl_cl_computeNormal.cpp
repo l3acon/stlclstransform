@@ -22,8 +22,8 @@ using namespace std;
 // this kernel takes ~16 FLOPS
 const char * stl_computeNormal_kernel_source  =
 "__kernel                                               "
-"\nvoid _kComputeNormal(                        "
-"\n                __global float *vi,          "
+"\nvoid _kComputeNormal(                                "
+"\n            __global float *vi,                      "
 "\n            __global float *verto)                   "
 "\n{                                                    "
 "\n                                                     "
@@ -34,11 +34,11 @@ const char * stl_computeNormal_kernel_source  =
 "\n    //fairly sure this actually works                "
 "\n    float t[4];                                      "
 "\n    t[0] = (vi[ii+4]-vi[ii+3])*(vi[ii+8]-vi[ii+6])   "
-            " - (vi[ii+7]-vi[ii+6])*(vi[ii+5]-vi[ii+3]) "
+" - (vi[ii+7]-vi[ii+6])*(vi[ii+5]-vi[ii+3]); "
 "\n    t[1] = (vi[ii+7]-vi[ii+6])*(vi[ii+2]-vi[ii+0])   "
-            " - (vi[ii+1]-vi[ii+0])*(vi[ii+8]-vi[ii+6]) "
+" - (vi[ii+1]-vi[ii+0])*(vi[ii+8]-vi[ii+6]); "
 "\n    t[2] = (vi[ii+1]-vi[ii+0])*(vi[ii+5]-vi[ii+3])   "
-            " - (vi[ii+4]-vi[ii+3])*(vi[ii+2]-vi[ii+0]) "
+" - (vi[ii+4]-vi[ii+3])*(vi[ii+2]-vi[ii+0]); "
 "\n    t[3] = t[1]+t[2]+t[3];                           "
 "\n                                                     "
 "\n    verto[io  ] = t[0]/t[3];                         "   
@@ -55,11 +55,11 @@ cl_int stlclComputeNormal(
     unsigned int nVerticies = verticies.size();
 
     //check if there are correct number of verticies.
-    if( fmod((float) nVerticies, 3.0)  != 0 )   
-    {
-        printf("Error num vertex is incorrect\n");
-        exit(1); //change this
-    }
+    //if( fmod((float) nVerticies, 3.0)  != 0 )   
+    //{
+    //    printf("Error num vertex is incorrect\n");
+    //    exit(1); //change this
+    //}
 
     //size_t vertexBytes = sizeof(float)*12;
     size_t vertexBytes = nVerticies * sizeof(float);
