@@ -17,9 +17,10 @@
 
 using namespace std;
 
+
 CLI * cliInitialize()
 {
-    CLI *cli =  (CLI*) malloc(sizeof(CLI));
+    CLI *cli =  (CLI*) malloc( sizeof(CLI)) ;
 
     //-----------------------------------------------------
     // STEP 1: Discover and initialize the platforms
@@ -28,7 +29,7 @@ CLI * cliInitialize()
     // platforms
     cli->status = clGetPlatformIDs(0, NULL, &cli->numPlatforms);
     // Allocate enough space for each platform
-    cli->platforms = (cl_platform_id*)malloc(cli->numPlatforms*sizeof(cl_platform_id));
+    cli->platforms = (cl_platform_id*)malloc(cli->numPlatforms * sizeof(cl_platform_id));
     // Fill in platforms with clGetPlatformIDs()
     cli->status = clGetPlatformIDs(cli->numPlatforms, cli->platforms, 
                 NULL);
@@ -84,7 +85,42 @@ CLI * cliInitialize()
         0, 
         &cli->status);
 
-    return cli;    
+    return cli;
+}
+
+// special function for kernel functions
+void cliKernelArgsSet(
+    void* ptr,              //I want to restrict this
+    size_t bufferBytes,  
+    int argn, 
+    cl_mem_flags memflag,
+    CLI* cli)
+{
+    cli->clMemDes[argn] = clCreateBuffer(
+        cli->context,
+        memflag,
+        bufferBytes,
+        NULL,
+        &cli->status);
+
+    if(memflag == CL_MEM_READ_ONLY)
+        cli->status = clEnqueueWriteBuffer(
+            cli->cmdQueue,
+            cli->clMemDes[argn],
+            CL_FALSE,
+            0,
+            bufferBytes,
+            ptr,
+            0,
+            NULL,
+            NULL);
+
+    cli->status = clSetKernelArg(
+        cli->kernel,
+        argn,
+        sizeof(cli->clMemDes[argn]),
+        &ptr);
+    return;
 }
 
 void cliBuild (CLI* cli, const char* programSource, const char * kernel_name)

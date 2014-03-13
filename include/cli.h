@@ -41,6 +41,8 @@ typedef struct cli_s
     // used for 8: Create the kernel
     cl_kernel kernel;
 
+    std::vector<cl_mem> clMemDes;
+
 } CLI;
 
 
