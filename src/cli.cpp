@@ -88,7 +88,7 @@ CLI * cliInitialize()
     return cli;
 }
 
-// special function for kernel functions
+// special function for buffering and setting kernel arguments
 void cliKernelArgsSet(
     void* ptr,              //I want to restrict this
     size_t bufferBytes,  

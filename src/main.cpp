@@ -63,7 +63,7 @@ int main()
 
     CLI *cli_computeNormal = cliInitialize();     
     cliBuild(cli_computeNormal, stl_cl_computeNormal_kernel_source, "_kComputeNormal");
-    
+
     CLI *cli_vertexTransform = cliInitialize();
     cliBuild(cli_vertexTransform, stl_cl_vertexTransform_kernel_source, "_kVertexTransform");
 
@@ -87,6 +87,8 @@ int main()
             }
         #endif
 
+        
+        // Z sort
 
         normalBuffer = (float*) malloc( sizeof(float)*normals.size());
         stlclComputeNormal(verticies, normalBuffer, errors, cli_computeNormal);
