@@ -23,7 +23,12 @@
 
 using namespace std;
 
-// this kernel takes ~40-50 FLOPS 
+// this kernel takes ~40-50 FLOPS
+// Global memory reads: 12*4 (xMat) + 9*4 (vi) = 84 BYTES
+// Global memory writes: 9*4 (verto) = 36 BYTES
+
+/// (GDDR5 can transfer at most 32 BYTES per clock)
+
 const char * stl_cl_vertexTransform_kernel_source  =
 "__kernel                                                   "
 "\nvoid _kVertexTransform(                          "
@@ -233,8 +238,6 @@ cl_int stlclVertexTransform(
     clReleaseMemObject(bufferC);
 
     // Free host resources
-    //free(A);
-    //free(B);
-    //free(C);
+
     return cli->status;
 }

@@ -20,6 +20,11 @@
 using namespace std;
 
 // this kernel takes ~16 FLOPS
+// Global memory reads: 9*4 (vi) = 36 BYTES
+// Global memory writes: 3*4 (verto) = 12 BYTES
+
+/// (GDDR5 can transfer at most 32 BYTES per clock)
+
 const char * stl_computeNormal_kernel_source  =
 "__kernel                                               "
 "\nvoid _kComputeNormal(                                "
@@ -207,8 +212,6 @@ cl_int stlclComputeNormal(
     clReleaseMemObject(bufferC);
 
     // Free host resources
-    //free(A);
-    //free(B);
-    //free(C);
+
     return cli->status;
 }

@@ -4,11 +4,15 @@
 #include <cstdlib>
 #include <vector>
 #include <cmath>
+#include <time.h> 
+
 
 #include "stl_cl_vertexTransform.h"
 #include "stl_cl_computeNormal.h"
 #include "stl.h"
 #include "cli.h"
+
+#define CL_ERRORS FALSE
 
 using namespace std;
 
@@ -20,7 +24,7 @@ extern cl_int stlclComputeNormal(
 int main() 
 {
     const char* stlFile = "Ring.stl";
-
+    clock_t watch;
     //use this vector for erros
     std::vector<cl_int> errors;
 
@@ -57,26 +61,36 @@ int main()
     //    printf("%d %f\n", i, verticies[i] );
     //}
 
+    // start cloock
+    watch = clock();
+
     vertexBuffer = (float*) malloc( sizeof(float)*verticies.size());
 
-    if( stlclVertexTransform(matTransform, verticies, vertexBuffer, errors))
-    {
+    stlclVertexTransform(matTransform, verticies, vertexBuffer, errors);
+
+    #if CL_ERRORS
         for( std::vector<cl_int>::const_iterator i = errors.begin(); i != errors.end(); ++i)
         {
             printf("clVertexTransform:");
             PrintCLIStatus(*i);
         }
-    }
+    #endif
+
 
     normalBuffer = (float*) malloc( sizeof(float)*normals.size());
-    if( stlclComputeNormal(verticies, normalBuffer, errors) )
-    {
+    stlclComputeNormal(verticies, normalBuffer, errors);
+    
+    #if CL_ERRORS
         for( std::vector<cl_int>::const_iterator i = errors.begin(); i != errors.end(); ++i)
         {
             printf("clComputeNormal: ");
             PrintCLIStatus(*i);
         }
-    }
+    #endif
+    
+    //end stopwatch
+    watch = clock() - watch;
+
 
     //for (int i = 0; i < verticies.size(); ++i)
     //{
@@ -84,6 +98,8 @@ int main()
     //}
 
     //printf("Error in: %f",(stlVerifyTransform(matTransform, vertexBuffer, verticies.data(), verticies.size()/9 )));
+    
+    printf("%f seconds elapsed\nAssuming %ld clocks/sec\n", ((double)watch)/CLOCKS_PER_SEC,(long)CLOCKS_PER_SEC );
 
     return 0;
 }
