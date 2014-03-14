@@ -21,12 +21,6 @@
 
 using namespace std;
 
-
-extern cl_int stlclComputeNormal(
-    std::vector<float> &verticies, 
-    float *tempVBuff,
-    std::vector<cl_int> &cliStati);
-
 int main() 
 {
     const char* stlFile = "Ring.stl";
@@ -78,46 +72,46 @@ int main()
     timespec watch[BENCHSIZE], stop[BENCHSIZE];
     for (int i = 0; i < BENCHSIZE; ++i)
     {
-    clock_gettime(CLOCK_REALTIME, &watch[i]);
+        clock_gettime(CLOCK_REALTIME, &watch[i]);
     #endif
 
-    vertexBuffer = (float*) malloc( sizeof(float)*verticies.size());
+        vertexBuffer = (float*) malloc( sizeof(float)*verticies.size());
 
-    stlclVertexTransform(matTransform, verticies, vertexBuffer, errors, cli_vertexTransform);
+        stlclVertexTransform(matTransform, verticies, vertexBuffer, errors, cli_vertexTransform);
 
-    #if CL_ERRORS
-        for( std::vector<cl_int>::const_iterator i = errors.begin(); i != errors.end(); ++i)
-        {
-            printf("clVertexTransform:");
-            PrintCLIStatus(*i);
-        }
-    #endif
+        #if CL_ERRORS
+            for( std::vector<cl_int>::const_iterator i = errors.begin(); i != errors.end(); ++i)
+            {
+                printf("clVertexTransform:");
+                PrintCLIStatus(*i);
+            }
+        #endif
 
 
-    normalBuffer = (float*) malloc( sizeof(float)*normals.size());
-    stlclComputeNormal(verticies, normalBuffer, errors, cli_computeNormal);
-    
-    #if CL_ERRORS
-        for( std::vector<cl_int>::const_iterator i = errors.begin(); i != errors.end(); ++i)
-        {
-            printf("clComputeNormal: ");
-            PrintCLIStatus(*i);
-        }
-    #endif
-    
+        normalBuffer = (float*) malloc( sizeof(float)*normals.size());
+        stlclComputeNormal(verticies, normalBuffer, errors, cli_computeNormal);
+        
+        #if CL_ERRORS
+            for( std::vector<cl_int>::const_iterator i = errors.begin(); i != errors.end(); ++i)
+            {
+                printf("clComputeNormal: ");
+                PrintCLIStatus(*i);
+            }
+        #endif
+        
     #if TIME    
-    clock_gettime(CLOCK_REALTIME, &stop[i]); // Works on Linux but not OSX
+        clock_gettime(CLOCK_REALTIME, &stop[i]); // Works on Linux but not OSX
     }
 
-    timespec temp;
-    for (int i = 0; i < BENCHSIZE; ++i)
+    timespec acc = {stop[0].tv_sec - watch[0].tv_sec,stop[0].tv_nsec - watch[0].tv_nsec};
+    for (int i = 1; i < BENCHSIZE-1; ++i)
     {
-        temp.tv_sec += stop.tv_sec - watch.tv_sec;
-        temp.tv_nsec += stop.tv_nsec - watch.tv_nsec;
+        acc.tv_sec += stop[i].tv_sec - watch[i].tv_sec;
+        acc.tv_nsec += stop[i].tv_nsec - watch[i].tv_nsec;
     }
     timespec avg;
-    avg.tv_sec = temp.tv_sec/BENCHSIZE;
-    avg.tv_nsec = temp.tv_nsec/BENCHSIZE;
+    avg.tv_sec = acc.tv_sec/BENCHSIZE;
+    avg.tv_nsec = acc.tv_nsec/BENCHSIZE;
     printf("[elapsed time] %f", (double) avg.tv_sec + avg.tv_nsec/1e9);
     #endif
 
