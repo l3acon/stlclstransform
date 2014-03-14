@@ -80,10 +80,10 @@ int main()
         stlclVertexTransform(matTransform, verticies, vertexBuffer, errors, cli_vertexTransform);
 
         #if CL_ERRORS
-            for( std::vector<cl_int>::const_iterator i = errors.begin(); i != errors.end(); ++i)
+            for( std::vector<cl_int>::const_iterator iter = errors.begin(); iter != errors.end(); ++iter)
             {
                 printf("clVertexTransform:");
-                PrintCLIStatus(*i);
+                PrintCLIStatus(*iter);
             }
         #endif
 
@@ -92,10 +92,10 @@ int main()
         stlclComputeNormal(verticies, normalBuffer, errors, cli_computeNormal);
         
         #if CL_ERRORS
-            for( std::vector<cl_int>::const_iterator i = errors.begin(); i != errors.end(); ++i)
+            for( std::vector<cl_int>::const_iterator iter = errors.begin(); iter != errors.end(); ++iter)
             {
                 printf("clComputeNormal: ");
-                PrintCLIStatus(*i);
+                PrintCLIStatus(*iter);
             }
         #endif
         
@@ -103,7 +103,7 @@ int main()
         clock_gettime(CLOCK_REALTIME, &stop[i]); // Works on Linux but not OSX
     }
 
-    timespec acc = {stop[0].tv_sec - watch[0].tv_sec,stop[0].tv_nsec - watch[0].tv_nsec};
+    timespec acc = {stop[0].tv_sec - watch[0].tv_sec, stop[0].tv_nsec - watch[0].tv_nsec};
     for (int i = 1; i < BENCHSIZE-1; ++i)
     {
         acc.tv_sec += stop[i].tv_sec - watch[i].tv_sec;
