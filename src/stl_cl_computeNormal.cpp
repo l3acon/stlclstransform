@@ -18,13 +18,6 @@
 
 using namespace std;
 
-// this kernel takes ~16 FLOPS
-// Global memory reads: 9*4 (vi) = 36 BYTES
-// Global memory writes: 3*4 (verto) = 12 BYTES
-
-/// (GDDR5 can transfer at most 32 BYTES per clock)
-
-
 cl_int stlclComputeNormal(
     std::vector<float> &verticies, 
     float *normalBuffer, 

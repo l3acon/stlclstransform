@@ -102,17 +102,10 @@ int main()
     #if TIME    
         clock_gettime(CLOCK_REALTIME, &stop[i]); // Works on Linux but not OSX
     }
-
-    timespec acc = {stop[0].tv_sec - watch[0].tv_sec, stop[0].tv_nsec - watch[0].tv_nsec};
-    for (int i = 1; i < BENCHSIZE-1; ++i)
-    {
-        acc.tv_sec += stop[i].tv_sec - watch[i].tv_sec;
-        acc.tv_nsec += stop[i].tv_nsec - watch[i].tv_nsec;
-    }
-    timespec avg;
-    avg.tv_sec = acc.tv_sec/BENCHSIZE;
-    avg.tv_nsec = acc.tv_nsec/BENCHSIZE;
-    printf("[elapsed time] %f", (double) avg.tv_sec + avg.tv_nsec/1e9);
+    double acc = 0.0;
+    for (int i = 0; i < BENCHSIZE; ++i)
+        acc += stop[i].tv_sec - watch[i].tv_sec + (stop[i].tv_nsec - watch[i].tv_nsec)/1e9;
+    printf("[elapsed time] %f\n", acc/BENCHSIZE);
     #endif
 
     //for (int i = 0; i < verticies.size(); ++i)

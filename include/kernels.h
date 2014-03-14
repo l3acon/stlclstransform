@@ -1,11 +1,19 @@
 #ifndef KERNELS_H
 #define KERNELS_H
 
+
+
+// this kernel takes ~40-50 FLOPS
+// Global memory reads: 12*4 (xMat) + 9*4 (vi) = 84 BYTES
+// Global memory writes: 9*4 (verto) = 36 BYTES
+
+// (GDDR5 can transfer at most 32 BYTES per clock)
+
 const char * stl_cl_vertexTransform_kernel_source  =
 "__kernel                                                   "
-"\nvoid _kVertexTransform(                          "
-"\n            __global float *xMat,                   "
-"\n            __global float *vi,                    "
+"\nvoid _kVertexTransform(                          		"
+"\n            __global float *xMat,                   		"
+"\n            __global float *vi,                    		"
 "\n            __global float *verto)                       "      //restrict?
 "\n{                                                        "
 "\n                                                         "
@@ -37,6 +45,12 @@ const char * stl_cl_vertexTransform_kernel_source  =
 "\n}                                                                                    "
 ;
 
+
+// this kernel takes ~16 FLOPS
+// Global memory reads: 9*4 (vi) = 36 BYTES
+// Global memory writes: 3*4 (verto) = 12 BYTES
+
+// (GDDR5 can transfer at most 32 BYTES per clock)
 
 const char * stl_cl_computeNormal_kernel_source  =
 "__kernel                                               "
