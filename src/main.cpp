@@ -121,7 +121,10 @@ int main()
     //}
 
     //printf("Error in: %f",(stlVerifyTransform(matTransform, vertexBuffer, verticies.data(), verticies.size()/9 )));
- 
+    
+    cliRelease(cli_computeNormal);
+    cliRelease(cli_vertexTransform);
+
     return 0;
 }
 

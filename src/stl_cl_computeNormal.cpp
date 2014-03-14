@@ -178,7 +178,6 @@ cl_int stlclComputeNormal(
 
 
     // Free OpenCL resources
-    cliRelease(cli);
     clReleaseMemObject(bufferA);
     clReleaseMemObject(bufferC);
 

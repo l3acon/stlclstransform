@@ -194,7 +194,6 @@ cl_int stlclVertexTransform(
         NULL);
 
     // Free OpenCL resources
-    cliRelease(cli);
     clReleaseMemObject(bufferA);
     clReleaseMemObject(bufferB);
     clReleaseMemObject(bufferC);
