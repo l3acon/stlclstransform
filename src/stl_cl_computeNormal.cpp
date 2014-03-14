@@ -24,37 +24,12 @@ using namespace std;
 
 /// (GDDR5 can transfer at most 32 BYTES per clock)
 
-const char * stl_computeNormal_kernel_source  =
-"__kernel                                               "
-"\nvoid _kComputeNormal(                                "
-"\n            __global float *vi,                      "
-"\n            __global float *verto)                   "
-"\n{                                                    "
-"\n                                                     "
-"\n    // Get the work-item’s unique ID                 "
-"\n    unsigned int ii = 9*get_global_id(0);            "
-"\n    unsigned int io = 3*get_global_id(0);            "
-"\n                                                     "
-"\n    //fairly sure this actually works                "
-"\n    float t[4];                                      "
-"\n    t[0] = (vi[ii+4]-vi[ii+3])*(vi[ii+8]-vi[ii+6])   "
-" - (vi[ii+7]-vi[ii+6])*(vi[ii+5]-vi[ii+3]); "
-"\n    t[1] = (vi[ii+7]-vi[ii+6])*(vi[ii+2]-vi[ii+0])   "
-" - (vi[ii+1]-vi[ii+0])*(vi[ii+8]-vi[ii+6]); "
-"\n    t[2] = (vi[ii+1]-vi[ii+0])*(vi[ii+5]-vi[ii+3])   "
-" - (vi[ii+4]-vi[ii+3])*(vi[ii+2]-vi[ii+0]); "
-"\n    t[3] = t[1]+t[2]+t[3];                           "
-"\n                                                     "
-"\n    verto[io  ] = t[0]/t[3];                         "   
-"\n    verto[io+1] = t[1]/t[3];                         "  
-"\n    verto[io+2] = t[2]/t[3];                         "  
-"\n}                                                    "
-;
 
 cl_int stlclComputeNormal(
     std::vector<float> &verticies, 
     float *normalBuffer, 
-    std::vector<cl_int> &cliStati)
+    std::vector<cl_int> &cliStati,
+    CLI * cli)
 {
     unsigned int nVerticies = verticies.size();
 
@@ -71,9 +46,6 @@ cl_int stlclComputeNormal(
     size_t normalBytes = nVerticies * sizeof(float)/3;
 
     //initalize CL interface and build kernel
-    CLI *cli = cliInitialize();     
-    cliBuild(cli, stl_computeNormal_kernel_source, "_kComputeNormal");
-    
     // declare CL memory buffers
     cl_mem bufferA;
     cl_mem bufferC;

@@ -28,55 +28,18 @@ using namespace std;
 
 /// (GDDR5 can transfer at most 32 BYTES per clock)
 
-const char * stl_cl_vertexTransform_kernel_source  =
-"__kernel                                                   "
-"\nvoid _kVertexTransform(                          "
-"\n            __global float *xMat,                   "
-"\n            __global float *vi,                    "
-"\n            __global float *verto)                       "      //restrict?
-"\n{                                                        "
-"\n                                                         "
-"\n    // Get the work-item’s unique ID                     "
-"\n    unsigned int i = 12*get_global_id(0);                "
-"\n                                                         "
-"\n    // do the matTransform                               "
-"\n                                                         "
-"\n    // x1-3 = 0 1 2                                      "
-"\n    // y1-3 = 3 4 5                                      "
-"\n    // z1-3 = 6 7 8                                      "
-"\n                                                         "
-"\n    //there's a decent chance this doesnt actually work  "
-"\n    //x coordinates                                      "
-"\n    verto[i+0] = xMat[0]*vi[i+0] + xMat[1]*vi[i+3] + xMat[2]*vi[i+6] + xMat[3];      "
-"\n    verto[i+1] = xMat[0]*vi[i+1] + xMat[1]*vi[i+4] + xMat[2]*vi[i+7] + xMat[3];      "
-"\n    verto[i+2] = xMat[0]*vi[i+2] + xMat[1]*vi[i+5] + xMat[2]*vi[i+8] + xMat[3];      "
-"\n                                                                                     "
-"\n    //y coordinates                                                                  "
-"\n    verto[i+3] = xMat[4]*vi[i+0] + xMat[5]*vi[i+3] + xMat[6]*vi[i+6] + xMat[7];      "
-"\n    verto[i+4] = xMat[4]*vi[i+1] + xMat[5]*vi[i+4] + xMat[6]*vi[i+7] + xMat[7];      "
-"\n    verto[i+5] = xMat[4]*vi[i+2] + xMat[5]*vi[i+5] + xMat[6]*vi[i+8] + xMat[7];      "
-"\n                                                                                     "
-"\n    //z coordinates                                                                  "
-"\n    verto[i+6] = xMat[8]*vi[i+0] + xMat[9]*vi[i+3] + xMat[10]*vi[i+6] + xMat[11];    "
-"\n    verto[i+7] = xMat[8]*vi[i+1] + xMat[9]*vi[i+4] + xMat[10]*vi[i+7] + xMat[11];    "
-"\n    verto[i+8] = xMat[8]*vi[i+2] + xMat[9]*vi[i+5] + xMat[10]*vi[i+8] + xMat[11];    "
-"\n                                                                                     "
-"\n}                                                                                    "
-;
 
 cl_int stlclVertexTransform(
     float *matTransform, 
     std::vector<float> &verticies, 
     float *vertexBuffer,
-    std::vector<cl_int> &cliStati)
+    std::vector<cl_int> &cliStati,
+    CLI* cli)
 {
     size_t matBytes = sizeof(float)*12;
     unsigned int nVerticies = verticies.size();
     size_t vertexBytes = nVerticies * sizeof(float);
 
-    CLI *cli = cliInitialize();
-    cliBuild(cli, stl_cl_vertexTransform_kernel_source,"_kVertexTransform");
-    
     cl_mem bufferA;
     cl_mem bufferB;
     cl_mem bufferC;

@@ -19,12 +19,12 @@
 #endif
 
 
-
 extern cl_int stlclVertexTransform(
 	float *matTransform, 
 	std::vector<float> &verticies, 
 	float *vertexBuffer,
-	std::vector<cl_int> &cliStati);
+	std::vector<cl_int> &cliStati,
+	CLI* cli);
 
 
 #endif

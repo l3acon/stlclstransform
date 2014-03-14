@@ -10,13 +10,16 @@
 #include "stl_cl_computeNormal.h"
 #include "stl.h"
 #include "cli.h"
+#include "kernels.h"
 
-  
-#define CL_ERRORS 0
+#define CL_ERRORS 1
 #define TIME 0
 
-using namespace std;
+#if TIME
+#define BENCHSIZE 10
+#endif
 
+using namespace std;
 
 
 extern cl_int stlclComputeNormal(
@@ -64,14 +67,23 @@ int main()
     //    printf("%d %f\n", i, verticies[i] );
     //}
 
+    CLI *cli_computeNormal = cliInitialize();     
+    cliBuild(cli_computeNormal, stl_cl_computeNormal_kernel_source, "_kComputeNormal");
+    
+    CLI *cli_vertexTransform = cliInitialize();
+    cliBuild(cli_vertexTransform, stl_cl_vertexTransform_kernel_source, "_kVertexTransform");
+
+
     #if TIME
-    timespec watch, stop;
-    clock_gettime(CLOCK_REALTIME, &watch);
+    timespec watch[BENCHSIZE], stop[BENCHSIZE];
+    for (int i = 0; i < BENCHSIZE; ++i)
+    {
+    clock_gettime(CLOCK_REALTIME, &watch[i]);
     #endif
 
     vertexBuffer = (float*) malloc( sizeof(float)*verticies.size());
 
-    stlclVertexTransform(matTransform, verticies, vertexBuffer, errors);
+    stlclVertexTransform(matTransform, verticies, vertexBuffer, errors, cli_vertexTransform);
 
     #if CL_ERRORS
         for( std::vector<cl_int>::const_iterator i = errors.begin(); i != errors.end(); ++i)
@@ -83,7 +95,7 @@ int main()
 
 
     normalBuffer = (float*) malloc( sizeof(float)*normals.size());
-    stlclComputeNormal(verticies, normalBuffer, errors);
+    stlclComputeNormal(verticies, normalBuffer, errors, cli_computeNormal);
     
     #if CL_ERRORS
         for( std::vector<cl_int>::const_iterator i = errors.begin(); i != errors.end(); ++i)
@@ -94,9 +106,19 @@ int main()
     #endif
     
     #if TIME    
-    clock_gettime(CLOCK_REALTIME, &stop); // Works on Linux but not OSX
-       
-    printf("[elapsed time] %f", (double) (stop.tv_sec - watch.tv_sec + (stop.tv_nsec - watch.tv_nsec) /1e9));
+    clock_gettime(CLOCK_REALTIME, &stop[i]); // Works on Linux but not OSX
+    }
+
+    timespec temp;
+    for (int i = 0; i < BENCHSIZE; ++i)
+    {
+        temp.tv_sec += stop.tv_sec - watch.tv_sec;
+        temp.tv_nsec += stop.tv_nsec - watch.tv_nsec;
+    }
+    timespec avg;
+    avg.tv_sec = temp.tv_sec/BENCHSIZE;
+    avg.tv_nsec = temp.tv_nsec/BENCHSIZE;
+    printf("[elapsed time] %f", (double) avg.tv_sec + avg.tv_nsec/1e9);
     #endif
 
     //for (int i = 0; i < verticies.size(); ++i)

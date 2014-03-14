@@ -22,9 +22,11 @@
 #error Platform not supported
 #endif
 
+
 extern cl_int stlclComputeNormal(
 	std::vector<float> &verticies, 
 	float *normalBuffer,
-	std::vector<cl_int> &cliStati);
+	std::vector<cl_int> &cliStati,
+	CLI* cli);
 
 #endif
