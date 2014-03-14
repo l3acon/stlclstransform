@@ -1,5 +1,3 @@
-SHELL = /bin/ksh
-
 CC := g++
 CFLAGS := -g -O3  -Wall #-v  
 ALLDEPS := 
@@ -12,20 +10,20 @@ NVIDIASDKDIR :=/usr/local/cuda
 INTELSDKDIR :=/usr/lib64/OpenCL/vendors/intel
 
 # assume there's only one SDK installed
-VENDOR_S := $(shell [ -d $(AMDAPPDIR) ] && echo "AMD")
-VENDOR_S := $(shell [ -d $(NVIDIASDKDIR) ] && echo "NVIDIA")
-VENDOR_S := $(shell [ -d $(INTELSDKDIR) ] && echo "INTEL")
+VENDOR_SA := $(shell [ -d $(AMDAPPDIR) ] && echo "AMD")
+VENDOR_SN := $(shell [ -d $(NVIDIASDKDIR) ] && echo "NVIDIA")
+VENDOR_SI := $(shell [ -d $(INTELSDKDIR) ] && echo "INTEL")
 
 # using uname to deterime operating system
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
-	ifeq ($(VENDOR_S),AMD)
+	ifeq ($(VENDOR_SA),AMD)
 	LIBDIR :=$(AMDAPPDIR)
 	endif
-	ifeq ($(VENDOR_S),NVIDIA)
+	ifeq ($(VENDOR_SN),NVIDIA)
 	LIBDIR :=$(NVIDIASDKDIR)
 	endif
-	ifeq ($(VENDOR_S),INTEL)
+	ifeq ($(VENDOR_SI),INTEL)
 	LIBDIR :=$(INTELSDKDIR)
 	endif
 	FW := -lOpenCL
