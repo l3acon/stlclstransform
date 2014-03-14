@@ -12,8 +12,8 @@
 #include "cli.h"
 
   
-#define CL_ERRORS FALSE
-#define TIME FALSE
+#define CL_ERRORS 0
+#define TIME 0
 
 using namespace std;
 
