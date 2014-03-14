@@ -12,7 +12,7 @@
 #include "cli.h"
 #include "kernels.h"
 
-#define CL_ERRORS 0
+#define CL_ERRORS 1
 
 #ifndef __APPLE__
 #define TIME 1
@@ -104,6 +104,7 @@ int main()
     #if TIME    
         clock_gettime(CLOCK_REALTIME, &stop[i]); // Works on Linux but not OSX
     }
+    
     double acc = 0.0;
     for (int i = 0; i < BENCHSIZE; ++i)
         acc += stop[i].tv_sec - watch[i].tv_sec + (stop[i].tv_nsec - watch[i].tv_nsec)/1e9;
