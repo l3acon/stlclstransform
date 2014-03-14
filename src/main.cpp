@@ -1,10 +1,9 @@
 
-// System includes
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
 #include <cmath>
-#include <time.h> 
+#include <time.h>
 
 
 #include "stl_cl_vertexTransform.h"
@@ -12,9 +11,13 @@
 #include "stl.h"
 #include "cli.h"
 
+  
 #define CL_ERRORS FALSE
+#define TIME FALSE
 
 using namespace std;
+
+
 
 extern cl_int stlclComputeNormal(
     std::vector<float> &verticies, 
@@ -24,7 +27,7 @@ extern cl_int stlclComputeNormal(
 int main() 
 {
     const char* stlFile = "Ring.stl";
-    clock_t watch;
+
     //use this vector for erros
     std::vector<cl_int> errors;
 
@@ -52,7 +55,7 @@ int main()
     //check sanity for verticies and normals
     if( fmod(verticies.size(),9.0) !=  0 || fmod(normals.size(),3.0) != 0 )
     {
-        cout<<"ERROR: verticies and normals don't make sense up"<<endl;
+        std::cout<<"ERROR: verticies and normals don't make sense up"<<std::endl;
         return 1;
     }
     
@@ -61,8 +64,10 @@ int main()
     //    printf("%d %f\n", i, verticies[i] );
     //}
 
-    // start cloock
-    watch = clock();
+    #if TIME
+    timespec watch, stop;
+    clock_gettime(CLOCK_REALTIME, &watch);
+    #endif
 
     vertexBuffer = (float*) malloc( sizeof(float)*verticies.size());
 
@@ -88,9 +93,11 @@ int main()
         }
     #endif
     
-    //end stopwatch
-    watch = clock() - watch;
-
+    #if TIME    
+    clock_gettime(CLOCK_REALTIME, &stop); // Works on Linux but not OSX
+       
+    printf("[elapsed time] %f", (double) (stop.tv_sec - watch.tv_sec + (stop.tv_nsec - watch.tv_nsec) /1e9));
+    #endif
 
     //for (int i = 0; i < verticies.size(); ++i)
     //{
@@ -98,9 +105,7 @@ int main()
     //}
 
     //printf("Error in: %f",(stlVerifyTransform(matTransform, vertexBuffer, verticies.data(), verticies.size()/9 )));
-    
-    printf("%f seconds elapsed\nAssuming %ld clocks/sec\n", ((double)watch)/CLOCKS_PER_SEC,(long)CLOCKS_PER_SEC );
-
+ 
     return 0;
 }
 

@@ -21,7 +21,7 @@ SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 HEADERS := $(shell find $(SRCDIR) -type f $(HDRPAT))
 ALLDEP += $(HEADERS)
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-LIB := -lm
+LIB := -lm -lrt
 INC := -I include -I$(LIBDIR)
 
 all: $(OBJECTS)
