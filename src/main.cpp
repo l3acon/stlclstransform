@@ -12,10 +12,10 @@
 #include "cli.h"
 #include "kernels.h"
 
-#define CL_ERRORS 1
-#define TIME 0
+#define CL_ERRORS 0
 
-#if TIME
+#ifndef __APPLE__
+#define TIME 1
 #define BENCHSIZE 10
 #endif
 
