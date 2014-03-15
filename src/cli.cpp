@@ -1,3 +1,9 @@
+
+// opencl interface
+// the wrappers make writing code in 
+// OpenCL cleaner and make it easier
+// to keep track of OpenCL objects
+
 #include <cstdio>
 #include <cstdlib>
 #include <string.h>
@@ -18,33 +24,39 @@
 using namespace std;
 
 
-CLI * cliInitialize()
+void cliInitialize(CLI*cli, std::vector<cl_int> &errors)
 {
-    CLI *cli =  (CLI*) malloc( sizeof(CLI)) ;
-
     //-----------------------------------------------------
     // STEP 1: Discover and initialize the platforms
     //-----------------------------------------------------
     // Use clGetPlatformIDs() to retrieve the number of 
     // platforms
-    cli->status = clGetPlatformIDs(0, NULL, &cli->numPlatforms);
+    cl_int localstatus;
+    localstatus = clGetPlatformIDs(0, NULL, &cli->numPlatforms);
+    errors.push_back(localstatus);
+
     // Allocate enough space for each platform
     cli->platforms = (cl_platform_id*)malloc(cli->numPlatforms * sizeof(cl_platform_id));
+
     // Fill in platforms with clGetPlatformIDs()
-    cli->status = clGetPlatformIDs(cli->numPlatforms, cli->platforms, 
+    localstatus = clGetPlatformIDs(cli->numPlatforms, cli->platforms, 
                 NULL);
+
+    errors.push_back(localstatus);
 
     //-----------------------------------------------------
     // STEP 2: Discover and initialize the devices
     //----------------------------------------------------- 
     // Use clGetDeviceIDs() to retrieve the number of 
     // devices present
-    cli->status = clGetDeviceIDs(
+    localstatus = clGetDeviceIDs(
         cli->platforms[0], 
         CL_DEVICE_TYPE_ALL, 
-        0, 
+        0,
         NULL, 
         &cli->numDevices);
+    errors.push_back(localstatus);
+
 
     // Allocate enough space for each device
     cli->devices = 
@@ -52,12 +64,13 @@ CLI * cliInitialize()
             cli->numDevices * sizeof(cl_device_id));
 
     // Fill in devices with clGetDeviceIDs()
-    cli->status = clGetDeviceIDs(
+    localstatus = clGetDeviceIDs(
         cli->platforms[0], 
         CL_DEVICE_TYPE_ALL,
         cli->numDevices, 
         cli->devices, 
         NULL);
+    errors.push_back(localstatus);
 
     //-----------------------------------------------------
     // STEP 3: Create a context
@@ -71,7 +84,8 @@ CLI * cliInitialize()
         cli->devices, 
         NULL, 
         NULL, 
-        &cli->status);
+        &localstatus);
+    errors.push_back(localstatus);
 
     //-----------------------------------------------------
     // STEP 4: Create a command queue
@@ -83,30 +97,36 @@ CLI * cliInitialize()
         cli->context, 
         cli->devices[0], 
         0, 
-        &cli->status);
+        &localstatus);
+    errors.push_back(localstatus);
 
-    return cli;
+    return ;
 }
 
-// special function for buffering and setting kernel arguments
-void cliKernelArgsSet(
-    void* ptr,              //I want to restrict this
+// wraper function for kernel arguments
+// this reduces the code required to
+// setup buffers and set arguments
+cl_mem cliKernelArgs(
+    void* ptr,              // I want to restrict this
     size_t bufferBytes,  
     int argn, 
     cl_mem_flags memflag,
-    CLI* cli)
+    CLI* cli,
+    std::vector<cl_int> &errors)
 {
-    cli->clMemDes[argn] = clCreateBuffer(
+    cl_int localstatus;
+    cl_mem clmemDes;
+    clmemDes = clCreateBuffer(
         cli->context,
         memflag,
         bufferBytes,
         NULL,
-        &cli->status);
+        &localstatus);
 
     if(memflag == CL_MEM_READ_ONLY)
-        cli->status = clEnqueueWriteBuffer(
+        localstatus = clEnqueueWriteBuffer(
             cli->cmdQueue,
-            cli->clMemDes[argn],
+            clmemDes,
             CL_FALSE,
             0,
             bufferBytes,
@@ -114,17 +134,24 @@ void cliKernelArgsSet(
             0,
             NULL,
             NULL);
-
-    cli->status = clSetKernelArg(
+    localstatus = clSetKernelArg(
         cli->kernel,
         argn,
-        sizeof(cli->clMemDes[argn]),
-        &ptr);
-    return;
+        sizeof(cl_mem),
+        &clmemDes);
+
+    errors.push_back(localstatus);
+
+    return clmemDes;
 }
 
-void cliBuild (CLI* cli, const char* programSource, const char * kernel_name)
+void cliBuild (
+    CLI* cli, 
+    const char* programSource, 
+    const char * kernel_name,
+    std::vector<cl_int> &errors)
 {
+    cl_int localstatus;
 
     //-----------------------------------------------------
     // STEP 7: Create and compile the program
@@ -136,24 +163,30 @@ void cliBuild (CLI* cli, const char* programSource, const char * kernel_name)
         1, 
         (const char**)&programSource,                                 
         NULL, 
-        &cli->status);
+        &localstatus);
+    errors.push_back(localstatus);
 
     // Build (compile) the program for the devices with
     // clBuildProgram()
-    cli->status = clBuildProgram(
+    localstatus = clBuildProgram(
         cli->program, 
         cli->numDevices, 
         cli->devices, 
         NULL, 
         NULL, 
         NULL);
-   
+    
+    errors.push_back(localstatus);
+
     //-----------------------------------------------------
     // STEP 8: Create the kernel
     //----------------------------------------------------- 
     // Use clCreateKernel() to create a kernel from the 
     // vector addition function (named "vecadd")
-    cli->kernel = clCreateKernel(cli->program, kernel_name , &cli->status);
+    cli->kernel = clCreateKernel(cli->program, kernel_name , &localstatus);
+    errors.push_back(localstatus);
+
+    return;
 }
 
 void cliRelease(CLI* cli)
@@ -224,10 +257,13 @@ void cliStatus(const cl_int err, char* stat)
     return; 
 }
 
-void PrintCLIStatus(cl_int err)
+void PrintCLIStatus(std::vector<cl_int> &errors)
 {
     char tmp[STATUS_CHAR_SIZE];
-    cliStatus(err, tmp);
-    //if(err)
+
+    for( std::vector<cl_int>::const_iterator iter = errors.begin(); iter != errors.end(); ++iter)
+    {
+        cliStatus(*iter, tmp);
         printf("%s\n", tmp);
+    }
 }

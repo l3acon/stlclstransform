@@ -1,3 +1,7 @@
+
+// kernels for OpenCL STL Vertex Transform and
+// STL Compute Normal 
+
 #ifndef KERNELS_H
 #define KERNELS_H
 

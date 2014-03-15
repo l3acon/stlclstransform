@@ -1,4 +1,8 @@
 
+// compute STL normal vectors for
+// given verticies on GPU
+// 
+
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
@@ -18,20 +22,15 @@
 
 using namespace std;
 
-cl_int stlclComputeNormal(
+void stlclComputeNormal(
     std::vector<float> &verticies, 
     float *normalBuffer, 
-    std::vector<cl_int> &cliStati,
-    CLI * cli)
+    CLI * cli,
+    std::vector<cl_int> &errors)
 {
+    cl_int localstatus;
     unsigned int nVerticies = verticies.size();
 
-    //check if there are correct number of verticies.
-    //if( fmod((float) nVerticies, 3.0)  != 0 )   
-    //{
-    //    printf("Error num vertex is incorrect\n");
-    //    exit(1); //change this
-    //}
 
     //size_t vertexBytes = sizeof(float)*12;
     size_t vertexBytes = nVerticies * sizeof(float);
@@ -50,8 +49,8 @@ cl_int stlclComputeNormal(
         CL_MEM_READ_ONLY,                         
         vertexBytes, 
         NULL, 
-        &cli->status);
-    cliStati.push_back(cli->status);
+        &localstatus);
+    errors.push_back(localstatus);
 
     // Use clCreateBuffer() to create a buffer object (d_C) 
     // with enough space to hold the output data
@@ -60,25 +59,12 @@ cl_int stlclComputeNormal(
         CL_MEM_WRITE_ONLY,                 
         normalBytes, 
         NULL, 
-        &cli->status);
-    cliStati.push_back(cli->status);
-
-        
-    // -- prototype copied here for reference --
-    //cl_int clEnqueueWriteBuffer (   cl_command_queue command_queue,
-    //    cl_mem buffer,
-    //    cl_bool blocking_write,
-    //    size_t offset,
-    //    size_t cb,
-    //    const void *ptr,
-    //    cl_uint num_events_in_wait_list,
-    //    const cl_event *event_wait_list,
-    //    cl_event *event)
-    //
+        &localstatus);
+    errors.push_back(localstatus);
 
     // Use clEnqueueWriteBuffer() to write input array A to
     // the device buffer bufferA
-    cli->status = clEnqueueWriteBuffer(
+    localstatus = clEnqueueWriteBuffer(
         cli->cmdQueue, 
         bufferA, 
         CL_FALSE,       //non-blocking buffer to device
@@ -88,34 +74,28 @@ cl_int stlclComputeNormal(
         0, 
         NULL, 
         NULL);
-    cliStati.push_back(cli->status);
+    errors.push_back(localstatus);
 
     // Associate the input and output buffers with the 
     // kernel 
     // using clSetKernelArg()
-    cli->status  = clSetKernelArg(
+    localstatus  = clSetKernelArg(
         cli->kernel, 
         0, 
         sizeof(cl_mem), 
         &bufferA);
 
-    cliStati.push_back(cli->status);
+    errors.push_back(localstatus);
 
 
-    cli->status = clSetKernelArg(
+    localstatus = clSetKernelArg(
         cli->kernel, 
         1, 
         sizeof(cl_mem), 
         &bufferC);
 
-    cliStati.push_back(cli->status);
+    errors.push_back(localstatus);
 
-
-    //if( fmod(nVerticies, 9.0)  != 0 )
-    //{
-    //    printf("Worksize Error\n");
-    //    exit(1); //change this
-    //}
 
     // Define an index space (global work size) of work 
     // items for 
@@ -132,7 +112,7 @@ cl_int stlclComputeNormal(
     // clEnqueueNDRangeKernel().
     // 'globalWorkSize' is the 1D dimension of the 
     // work-items
-    cli->status = clEnqueueNDRangeKernel(
+    localstatus = clEnqueueNDRangeKernel(
         cli->cmdQueue, 
         cli->kernel, 
         1, 
@@ -143,25 +123,12 @@ cl_int stlclComputeNormal(
         NULL, 
         NULL);
 
-    cliStati.push_back(cli->status);
-
-    // STEP 12: Read the output buffer back to the host
-    
-    // cl_int clEnqueueReadBuffer ( cl_command_queue command_queue,
-    //      cl_mem buffer,
-    //      cl_bool blocking_read,
-    //      size_t offset,
-    //      size_t cb,
-    //      void *ptr,
-    //      cl_uint num_events_in_wait_list,
-    //      const cl_event *event_wait_list,
-    //      cl_event *event)
-    //
+    errors.push_back(localstatus);
 
     clEnqueueReadBuffer(
         cli->cmdQueue, 
         bufferC, 
-        CL_TRUE, 
+        CL_TRUE,            // CL_TRUE is a BLOCKING read
         0, 
         normalBytes, 
         normalBuffer, 
@@ -176,5 +143,5 @@ cl_int stlclComputeNormal(
 
     // Free host resources
 
-    return cli->status;
+    return ;
 }

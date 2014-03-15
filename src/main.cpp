@@ -1,4 +1,12 @@
 
+// MATTHEW FERNANDEZ 2014
+// 
+// should probably add a license
+// 
+// benchmark/test program for STL transform on large STL files
+// OpenCL implimentation for GPGPU
+//
+
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
@@ -25,22 +33,20 @@ int main()
 {
     const char* stlFile = "Ring.stl";
 
-    //use this vector for erros
-    std::vector<cl_int> errors;
-
     std::vector<float> verticies;
     std::vector<float> normals;
-
+    std::vector<cl_int> errorsVT;
+    std::vector<cl_int> errorsCN;
+    
     //later we can just use the memory in a std::vector?
     float * vertexBuffer;
     float * normalBuffer;
 
-    float matTransform[12];
-    //float tol = 1e-6;
+    XformMat A;
 
     //initalize our transform matrix naively
-    for (int i = 0; i < 12; ++i)
-        matTransform[i] = i;
+    for (int i = 0; i < A.size; ++i)
+        A.stlTransformMatrix[i] = i;
 
     //file stuff
     if(stlRead(stlFile, verticies, normals))
@@ -55,18 +61,22 @@ int main()
         std::cout<<"ERROR: verticies and normals don't make sense up"<<std::endl;
         return 1;
     }
-    
-    //for (int i = 0; i < verticies.size() ; ++i)
-    //{
-    //    printf("%d %f\n", i, verticies[i] );
-    //}
 
-    CLI *cli_computeNormal = cliInitialize();     
-    cliBuild(cli_computeNormal, stl_cl_computeNormal_kernel_source, "_kComputeNormal");
+    CLI *cli_vertexTransform = (CLI*) malloc( sizeof(CLI));
+    cliInitialize(cli_vertexTransform, errorsVT);
+    cliBuild(
+        cli_vertexTransform, 
+        stl_cl_vertexTransform_kernel_source, 
+        "_kVertexTransform",
+        errorsVT);
 
-    CLI *cli_vertexTransform = cliInitialize();
-    cliBuild(cli_vertexTransform, stl_cl_vertexTransform_kernel_source, "_kVertexTransform");
-
+    CLI *cli_computeNormal = (CLI*) malloc( sizeof(CLI));
+    cliInitialize(cli_computeNormal, errorsCN);
+    cliBuild(
+        cli_computeNormal, 
+        stl_cl_computeNormal_kernel_source, 
+        "_kComputeNormal", 
+        errorsCN);
 
     #if TIME
     timespec watch[BENCHSIZE], stop[BENCHSIZE];
@@ -75,48 +85,45 @@ int main()
         clock_gettime(CLOCK_REALTIME, &watch[i]);
     #endif
 
-        vertexBuffer = (float*) malloc( sizeof(float)*verticies.size());
+        vertexBuffer = (float*) malloc( sizeof(float) * verticies.size());
 
-        stlclVertexTransform(matTransform, verticies, vertexBuffer, errors, cli_vertexTransform);
+        stlclVertexTransform(
+            &A, 
+            verticies, 
+            vertexBuffer, 
+            cli_vertexTransform, 
+            errorsVT);
 
         #if CL_ERRORS
-            for( std::vector<cl_int>::const_iterator iter = errors.begin(); iter != errors.end(); ++iter)
-            {
-                printf("clVertexTransform:");
-                PrintCLIStatus(*iter);
-            }
+        printf("_kVertexTransform:\n");
+        PrintCLIStatus(errorsVT);
         #endif
 
         
         // Z sort
 
-        normalBuffer = (float*) malloc( sizeof(float)*normals.size());
-        stlclComputeNormal(verticies, normalBuffer, errors, cli_computeNormal);
+        normalBuffer = (float*) malloc( sizeof(float) * normals.size());
+        stlclComputeNormal(
+            verticies, 
+            normalBuffer, 
+            cli_computeNormal, 
+            errorsCN);
         
         #if CL_ERRORS
-            for( std::vector<cl_int>::const_iterator iter = errors.begin(); iter != errors.end(); ++iter)
-            {
-                printf("clComputeNormal: ");
-                PrintCLIStatus(*iter);
-            }
+        printf("_kComputeNormal:\n");
+        PrintCLIStatus(errorsCN);
         #endif
         
     #if TIME    
         clock_gettime(CLOCK_REALTIME, &stop[i]); // Works on Linux but not OSX
     }
-    
+
     double acc = 0.0;
     for (int i = 0; i < BENCHSIZE; ++i)
         acc += stop[i].tv_sec - watch[i].tv_sec + (stop[i].tv_nsec - watch[i].tv_nsec)/1e9;
     printf("[elapsed time] %f\n", acc/BENCHSIZE);
     #endif
 
-    //for (int i = 0; i < verticies.size(); ++i)
-    //{
-    //    printf("n:%d xf1:%f  xf2:%f\n", i, vertexBuffer[i], verticies[i] );
-    //}
-
-    //printf("Error in: %f",(stlVerifyTransform(matTransform, vertexBuffer, verticies.data(), verticies.size()/9 )));
     
     cliRelease(cli_computeNormal);
     cliRelease(cli_vertexTransform);

@@ -4,7 +4,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <vector>
-#include <string.h>
 
 // OpenCL includes
 #ifdef __APPLE__
@@ -17,12 +16,11 @@
 
 typedef struct cli_s
 {
-	// internal status to check the output of each API call
-    cl_int status;
-    //std::vector<cl_int> status;
+public:
     //initialize our data we're keeping track of
     // used for  1: Discover and initialize the platforms
     cl_uint numPlatforms;
+
     cl_platform_id *platforms;
 
     // used for 2: Discover and initialize the devices
@@ -41,22 +39,36 @@ typedef struct cli_s
     // used for 8: Create the kernel
     cl_kernel kernel;
 
-    std::vector<cl_mem> clMemDes;
+    // internal status to check the output of each API call
+    //  this isn't working for some reason
+    //std::vector<cl_int> status;
 
-} CLI;
+    //I think the vectors need to be constructed, even in a struct
+    //std::vector<cl_mem> clMemDes;
+
+}CLI;
 
 
-extern CLI* cliInitialize();
+extern void cliInitialize(CLI*cli, std::vector<cl_int> &errors);
 
-extern void cliBuild (
+extern void cliBuild(
     CLI* cli, 
     const char* programSource, 
-    const char * kernel_name);
+    const char * kernel_name,
+    std::vector<cl_int> &errors);
 
 extern void cliRelease(CLI* cli);
 
 extern void cliStatus(const cl_int err, char*stat);
 
-extern void PrintCLIStatus(cl_int err);
+extern void PrintCLIStatus(std::vector<cl_int> &errors);
+
+extern cl_mem cliKernelArgs(
+    void* ptr,              // I want to restrict this
+    size_t bufferBytes,  
+    int argn, 
+    cl_mem_flags memflag,
+    CLI* cli,
+    std::vector<cl_int> &errors);
 
 #endif

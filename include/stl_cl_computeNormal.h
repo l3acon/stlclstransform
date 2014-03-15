@@ -23,10 +23,10 @@
 #endif
 
 
-extern cl_int stlclComputeNormal(
+extern void stlclComputeNormal(
 	std::vector<float> &verticies, 
 	float *normalBuffer,
-	std::vector<cl_int> &cliStati,
-	CLI* cli);
+	CLI* cli,
+	std::vector<cl_int> &errors);
 
 #endif

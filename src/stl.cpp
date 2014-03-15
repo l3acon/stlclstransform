@@ -1,4 +1,8 @@
 
+// STL fie I/O
+// very quick implimenation that isn't 
+// all correct
+
 #include <cstdio>
 #include <cstdlib>
 #include <vector>

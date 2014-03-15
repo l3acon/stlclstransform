@@ -1,4 +1,6 @@
 
+// transform STL verticies on GPU
+// notes:
 //test in GLGraphicWidget.cpp
 //glMultMatrixd(m_viewpoint.transformMatrix().data())
 
@@ -9,6 +11,7 @@
 #include <cmath>
 
 #include "cli.h"
+#include "stl.h"
 #include "stl_cl_vertexTransform.h"
 
 // OpenCL includes
@@ -22,114 +25,50 @@
 
 using namespace std;
 
-cl_int stlclVertexTransform(
-    float *matTransform, 
+void stlclVertexTransform(
+    XformMat* transform, 
     std::vector<float> &verticies, 
     float *vertexBuffer,
-    std::vector<cl_int> &cliStati,
-    CLI* cli)
+    CLI* cli,
+    std::vector<cl_int> &errors)
 {
-    size_t matBytes = sizeof(float)*12;
+    cl_int localstatus;
     unsigned int nVerticies = verticies.size();
     size_t vertexBytes = nVerticies * sizeof(float);
+    float transformArray[transform->size];
+    
+    for (int i = 0; i < transform->size; ++i)
+    {
+        transformArray[i] = transform->stlTransformMatrix[i];
+    }
 
     cl_mem bufferA;
     cl_mem bufferB;
     cl_mem bufferC;
 
-    // Use clCreateBuffer() to create a buffer object (d_A) 
-    // that will contain the data from the host array 
-    bufferA = clCreateBuffer(
-        cli->context, 
-        CL_MEM_READ_ONLY,                         
-        matBytes, 
-        NULL, 
-        &cli->status);
+    bufferA = cliKernelArgs(
+        transformArray,
+        transform->size*sizeof(float),
+        0,
+        CL_MEM_READ_ONLY,
+        cli,
+        errors);
 
-    cliStati.push_back(cli->status);
-
-    // Use clCreateBuffer() to create a buffer object (d_B)
-    // that will contain the data from the host array 
-    bufferB = clCreateBuffer(
-        cli->context, 
-        CL_MEM_READ_ONLY,                         
-        vertexBytes, 
-        NULL, 
-        &cli->status);
-
-    cliStati.push_back(cli->status);
-
-    // Use clCreateBuffer() to create a buffer object (d_C) 
-    // with enough space to hold the output data
-    bufferC = clCreateBuffer(
-        cli->context, 
-        CL_MEM_WRITE_ONLY,                 
-        vertexBytes, 
-        NULL, 
-        &cli->status);
-    
-        cliStati.push_back(cli->status);
-
-    // Use clEnqueueWriteBuffer() to write input array A to
-    // the device buffer bufferA
-    cli->status = clEnqueueWriteBuffer(
-        cli->cmdQueue, 
-        bufferA, 
-        CL_FALSE, 
-        0, 
-        matBytes,                         
-        matTransform, 
-        0, 
-        NULL, 
-        NULL);
-    
-    cliStati.push_back(cli->status);
-
-    // Use clEnqueueWriteBuffer() to write input array B to 
-    // the device buffer bufferB
-    cli->status = clEnqueueWriteBuffer(
-        cli->cmdQueue, 
-        bufferB, 
-        CL_FALSE,       //non-blocking buffer to device
-        0, 
-        vertexBytes,                                  
-        verticies.data(), 
-        0, 
-        NULL, 
-        NULL);
-
-    cliStati.push_back(cli->status);
-
-    // Associate the input and output buffers with the 
-    // kernel 
-    // using clSetKernelArg()
-    cli->status  = clSetKernelArg(
-        cli->kernel, 
-        0, 
-        sizeof(cl_mem), 
-        &bufferA);
-
-    cliStati.push_back(cli->status);
-
-    cli->status = clSetKernelArg(
-        cli->kernel,
+    bufferB = cliKernelArgs(
+        verticies.data(),
+        vertexBytes,
         1,
-        sizeof(cl_mem),
-        &bufferB);
+        CL_MEM_READ_ONLY,
+        cli,
+        errors);
 
-    cli->status = clSetKernelArg(
-        cli->kernel, 
-        2, 
-        sizeof(cl_mem), 
-        &bufferC);
-
-    cliStati.push_back(cli->status);
-
-    //if( fmod(nVerticies, 9.0)  != 0 )
-    //{
-    //    printf("Worksize Error\n");
-    //    exit(1); //change this
-    //}
+    bufferC = cliKernelArgs(
+        vertexBuffer,
+        vertexBytes,
+        2,
+        CL_MEM_WRITE_ONLY,
+        cli,
+        errors);
 
 
     // Define an index space (global work size) of work 
@@ -147,7 +86,7 @@ cl_int stlclVertexTransform(
     // clEnqueueNDRangeKernel().
     // 'globalWorkSize' is the 1D dimension of the 
     // work-items
-    cli->status = clEnqueueNDRangeKernel(
+    localstatus = clEnqueueNDRangeKernel(
         cli->cmdQueue, 
         cli->kernel, 
         1, 
@@ -158,27 +97,15 @@ cl_int stlclVertexTransform(
         NULL, 
         NULL);
 
-    cliStati.push_back(cli->status);
+    errors.push_back(localstatus);
 
 
     // STEP 12: Read the output buffer back to the host
     
-    // -- prototype reproduced here for reference --
-    //
-    // cl_int clEnqueueReadBuffer ( cl_command_queue command_queue,
-    //      cl_mem buffer,
-    //      cl_bool blocking_read,
-    //      size_t offset,
-    //      size_t cb,
-    //      void *ptr,
-    //      cl_uint num_events_in_wait_list,
-    //      const cl_event *event_wait_list,
-    //      cl_event *event)
-
     clEnqueueReadBuffer(
         cli->cmdQueue, 
         bufferC, 
-        CL_TRUE, 
+        CL_TRUE,        // CL_TRUE is a BLOCKING read
         0, 
         vertexBytes, 
         vertexBuffer, 
@@ -193,5 +120,5 @@ cl_int stlclVertexTransform(
 
     // Free host resources
 
-    return cli->status;
+    return;
 }

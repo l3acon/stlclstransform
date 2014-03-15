@@ -8,6 +8,7 @@
 #include <cmath>
 
 #include "cli.h"
+#include "stl.h"
 
 // OpenCL includes
 #ifdef __APPLE__
@@ -19,12 +20,12 @@
 #endif
 
 
-extern cl_int stlclVertexTransform(
-	float *matTransform, 
+extern void stlclVertexTransform(
+	XformMat *A, 
 	std::vector<float> &verticies, 
 	float *vertexBuffer,
-	std::vector<cl_int> &cliStati,
-	CLI* cli);
+	CLI* cli,
+	std::vector<cl_int> &errors);
 
 
 #endif
