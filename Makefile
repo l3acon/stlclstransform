@@ -46,7 +46,7 @@ OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 INC := -I include -I$(LIBDIR)
 
 all: $(OBJECTS)
-	@echo "$(CC) $(CFLAGS) $(INC) -o build/test $(OBJECTS)"; $(CC) $(CFLAGS) $(LIB) $(FW) $(INC) -o build/out $(OBJECTS)
+	@echo "$(CC) $(CFLAGS) $(LIB) $(FW) $(INC) -o build/out $(OBJECTS)"; $(CC) $(CFLAGS) $(LIB) $(FW) $(INC) -o build/out $(OBJECTS)
 
 $(BUILDDIR)/%.o:	$(SRCDIR)/%.$(SRCEXT) $(ALLDEP)
 	@mkdir -p $(BUILDDIR)
