@@ -23,7 +23,10 @@
 
 using namespace std;
 
-
+// Initialize our CLI wrapper
+// get OpenCL platform IDs
+// get OpenCL device IDs
+// create OpenCL Context and Command Queue
 void cliInitialize(CLI*cli, std::vector<cl_int> &errors)
 {
     //-----------------------------------------------------
@@ -145,6 +148,8 @@ cl_mem cliKernelArgs(
     return clmemDes;
 }
 
+// wrapper for building OpenCL program
+// 
 void cliBuild (
     CLI* cli, 
     const char* programSource, 
@@ -189,6 +194,7 @@ void cliBuild (
     return;
 }
 
+// release CLI memory
 void cliRelease(CLI* cli)
 {
 	clReleaseKernel(cli->kernel);
@@ -200,6 +206,8 @@ void cliRelease(CLI* cli)
 
 }
 
+// translate OpenCL status codes to human
+// readable errors
 void cliStatus(const cl_int err, char* stat)
 {
     //printing is inefficient anyway
@@ -257,6 +265,8 @@ void cliStatus(const cl_int err, char* stat)
     return; 
 }
 
+// print all CLI status/errors
+//
 void PrintCLIStatus(std::vector<cl_int> &errors)
 {
     char tmp[STATUS_CHAR_SIZE];

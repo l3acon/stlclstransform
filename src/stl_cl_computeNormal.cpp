@@ -31,71 +31,28 @@ void stlclComputeNormal(
     cl_int localstatus;
     unsigned int nVerticies = verticies.size();
 
-
     //size_t vertexBytes = sizeof(float)*12;
     size_t vertexBytes = nVerticies * sizeof(float);
-
     size_t normalBytes = nVerticies * sizeof(float)/3;
 
     //initalize CL interface and build kernel
     // declare CL memory buffers
-    cl_mem bufferA;
-    cl_mem bufferC;
-
-    // Use clCreateBuffer() to create a buffer object (d_A) 
-    // that will contain the data from the host array 
-    bufferA = clCreateBuffer(
-        cli->context, 
-        CL_MEM_READ_ONLY,                         
-        vertexBytes, 
-        NULL, 
-        &localstatus);
-    errors.push_back(localstatus);
-
-    // Use clCreateBuffer() to create a buffer object (d_C) 
-    // with enough space to hold the output data
-    bufferC = clCreateBuffer(
-        cli->context, 
-        CL_MEM_WRITE_ONLY,                 
-        normalBytes, 
-        NULL, 
-        &localstatus);
-    errors.push_back(localstatus);
-
-    // Use clEnqueueWriteBuffer() to write input array A to
-    // the device buffer bufferA
-    localstatus = clEnqueueWriteBuffer(
-        cli->cmdQueue, 
-        bufferA, 
-        CL_FALSE,       //non-blocking buffer to device
-        0, 
-        vertexBytes,                         
-        verticies.data(), 
-        0, 
-        NULL, 
-        NULL);
-    errors.push_back(localstatus);
-
-    // Associate the input and output buffers with the 
-    // kernel 
-    // using clSetKernelArg()
-    localstatus  = clSetKernelArg(
-        cli->kernel, 
-        0, 
-        sizeof(cl_mem), 
-        &bufferA);
-
-    errors.push_back(localstatus);
+    cl_mem bufferA = cliKernelArgs(
+        verticies.data(),
+        vertexBytes,
+        0,
+        CL_MEM_READ_ONLY,
+        cli,
+        errors);
 
 
-    localstatus = clSetKernelArg(
-        cli->kernel, 
-        1, 
-        sizeof(cl_mem), 
-        &bufferC);
-
-    errors.push_back(localstatus);
-
+    cl_mem bufferC = cliKernelArgs(
+        normalBuffer,
+        normalBytes,
+        1,
+        CL_MEM_WRITE_ONLY,
+        cli,
+        errors);
 
     // Define an index space (global work size) of work 
     // items for 
@@ -103,6 +60,7 @@ void stlclComputeNormal(
     // required, 
     // but can be used.
     size_t globalWorkSize[1];
+    
     // There are 'elements' work-items 
     globalWorkSize[0] = nVerticies/9;
 

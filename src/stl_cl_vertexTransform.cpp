@@ -38,15 +38,9 @@ void stlclVertexTransform(
     float transformArray[transform->size];
     
     for (int i = 0; i < transform->size; ++i)
-    {
         transformArray[i] = transform->stlTransformMatrix[i];
-    }
 
-    cl_mem bufferA;
-    cl_mem bufferB;
-    cl_mem bufferC;
-
-    bufferA = cliKernelArgs(
+    cl_mem bufferA = cliKernelArgs(
         transformArray,
         transform->size*sizeof(float),
         0,
@@ -54,7 +48,7 @@ void stlclVertexTransform(
         cli,
         errors);
 
-    bufferB = cliKernelArgs(
+    cl_mem bufferB = cliKernelArgs(
         verticies.data(),
         vertexBytes,
         1,
@@ -62,7 +56,7 @@ void stlclVertexTransform(
         cli,
         errors);
 
-    bufferC = cliKernelArgs(
+    cl_mem bufferC = cliKernelArgs(
         vertexBuffer,
         vertexBytes,
         2,
@@ -70,13 +64,13 @@ void stlclVertexTransform(
         cli,
         errors);
 
-
     // Define an index space (global work size) of work 
     // items for 
     // execution. A workgroup size (local work size) is not 
     // required, 
     // but can be used.
     size_t globalWorkSize[1];
+    
     // There are 'elements' work-items 
     globalWorkSize[0] = nVerticies/9;
 
