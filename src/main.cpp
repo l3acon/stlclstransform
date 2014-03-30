@@ -64,8 +64,6 @@ int main()
         return 1;
     }
 
-    printf("nverticies: %d\nnnormals:%d\n", verticies.size(), normals.size());
-
     // set up CLInterface resrouces
     CLI *cli_vertexTransform = (CLI*) malloc( sizeof(CLI));
     cliInitialize(cli_vertexTransform, errorsVT);
@@ -107,7 +105,7 @@ int main()
         #endif
 
         // Z sort
-        qsort(vertexBuffer, verticies.size() - 1, sizeof(float)*9, vertex_comparator);
+        //qsort(vertexBuffer, verticies.size() - 1, sizeof(float)*9, vertex_comparator);
 
         // compute normals
         normalBuffer = (float*) malloc( sizeof(float) * normals.size());
@@ -133,7 +131,6 @@ int main()
     printf("[elapsed time] %f\n", acc/BENCHSIZE);
     #endif
 
-    printf("BEFORE RELEASE\n");
     cliRelease(cli_computeNormal);
     cliRelease(cli_vertexTransform);
     return 0;
