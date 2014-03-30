@@ -13,8 +13,8 @@
 
 int vertex_comparator(const void *v1, const void *v2)
 {
-    const float *z1 = (float *)v1 + sizeof(float)*6;
-    const float *z2 = (float *)v2 + sizeof(float)*6;
+    const float *z1 = (float *)v1 + sizeof(float)*2;
+    const float *z2 = (float *)v2 + sizeof(float)*2;
     if (*z1 < *z2)
         return -1;
     else if (*z1 > *z2)

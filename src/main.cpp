@@ -20,7 +20,7 @@
 #include "cli.h"
 #include "kernels.h"
 
-#define CL_ERRORS 1
+#define CL_ERRORS 0
 
 #ifndef _WIN32
 #ifndef __APPLE__
@@ -33,7 +33,7 @@ using namespace std;
 
 int main() 
 {
-    const char* stlFile = "Ring.stl";
+    const char* stlFile = "MiddleRioGrande_Final_OneInchSpacing.stl";
 
     std::vector<float> verticies;
     std::vector<float> normals;
@@ -105,7 +105,7 @@ int main()
         #endif
 
         // Z sort
-        //qsort(vertexBuffer, verticies.size() - 1, sizeof(float)*9, vertex_comparator);
+        qsort(vertexBuffer, verticies.size()/9, sizeof(float)*9, vertex_comparator);
 
         // compute normals
         normalBuffer = (float*) malloc( sizeof(float) * normals.size());
