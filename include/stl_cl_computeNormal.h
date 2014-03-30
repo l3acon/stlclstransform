@@ -13,20 +13,12 @@
 
 #include "cli.h"
 
-// OpenCL includes
-#ifdef __APPLE__
-#include <OpenCL/opencl.h>
-#elif __linux
-#include <CL/cl.h>
-#else
-#error Platform not supported
-#endif
-
 
 extern void stlclComputeNormal(
-	std::vector<float> &verticies, 
-	float *normalBuffer,
-	CLI* cli,
-	std::vector<cl_int> &errors);
+    unsigned int nVerticies,
+    float *verticies, 
+    float *normalBuffer, 
+    CLI * cli,
+    std::vector<cl_int> &errors);
 
 #endif

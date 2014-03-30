@@ -10,6 +10,8 @@
 #include <OpenCL/opencl.h>
 #elif __linux
 #include <CL/cl.h>
+#elif _WIN32
+#include <CL/opencl.h>
 #else
 #error Platform not supported
 #endif
@@ -46,7 +48,7 @@ public:
     //I think the vectors need to be constructed, even in a struct
     //std::vector<cl_mem> clMemDes;
 
-}CLI;
+} CLI;
 
 
 extern void cliInitialize(CLI*cli, std::vector<cl_int> &errors);

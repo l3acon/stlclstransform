@@ -11,25 +11,17 @@
 #include "cli.h"
 #include "stl_cl_computeNormal.h"
 
-// OpenCL includes
-#ifdef __APPLE__
-#include <OpenCL/opencl.h>
-#elif __linux
-#include <CL/cl.h>
-#else
-#error Platform not supported
-#endif
 
 using namespace std;
 
 void stlclComputeNormal(
-    std::vector<float> &verticies, 
+    unsigned int nVerticies,
+    float *verticies, 
     float *normalBuffer, 
     CLI * cli,
     std::vector<cl_int> &errors)
 {
     cl_int localstatus;
-    unsigned int nVerticies = verticies.size();
 
     //size_t vertexBytes = sizeof(float)*12;
     size_t vertexBytes = nVerticies * sizeof(float);
@@ -38,7 +30,7 @@ void stlclComputeNormal(
     //initalize CL interface and build kernel
     // declare CL memory buffers
     cl_mem bufferA = cliKernelArgs(
-        verticies.data(),
+        verticies,
         vertexBytes,
         0,
         CL_MEM_READ_ONLY,

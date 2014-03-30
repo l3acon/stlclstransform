@@ -14,15 +14,6 @@
 #include "stl.h"
 #include "stl_cl_vertexTransform.h"
 
-// OpenCL includes
-#ifdef __APPLE__
-#include <OpenCL/opencl.h>
-#elif __linux
-#include <CL/cl.h>
-#else
-#error Platform not supported
-#endif
-
 using namespace std;
 
 void stlclVertexTransform(
@@ -49,7 +40,7 @@ void stlclVertexTransform(
         errors);
 
     cl_mem bufferB = cliKernelArgs(
-        verticies.data(),
+        &verticies.front(),
         vertexBytes,
         1,
         CL_MEM_READ_ONLY,

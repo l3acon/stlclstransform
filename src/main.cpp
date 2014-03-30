@@ -13,7 +13,7 @@
 #include <cmath>
 #include <time.h>
 
-
+#include "sorting.h"
 #include "stl_cl_vertexTransform.h"
 #include "stl_cl_computeNormal.h"
 #include "stl.h"
@@ -22,9 +22,11 @@
 
 #define CL_ERRORS 1
 
+#ifdef _WIN32
 #ifndef __APPLE__
 #define TIME 1
 #define BENCHSIZE 10
+#endif
 #endif
 
 using namespace std;
@@ -46,7 +48,7 @@ int main()
 
     //initalize our transform matrix naively
     for (int i = 0; i < A.size; ++i)
-        A.stlTransformMatrix[i] = i;
+        A.stlTransformMatrix[i] = (float) i;
 
     //file stuff
     if(stlRead(stlFile, verticies, normals))
@@ -99,12 +101,18 @@ int main()
         PrintCLIStatus(errorsVT);
         #endif
 
-        
+// void qsort (void* base, 
+//  size_t num, 
+//  size_t size, 
+//  int (*compar)(const void*,const void*));
+
         // Z sort
+        qsort(vertexBuffer, verticies.size(), sizeof(float)*9, vertex_comparator);
 
         normalBuffer = (float*) malloc( sizeof(float) * normals.size());
         stlclComputeNormal(
-            verticies, 
+            normals.size(),
+            vertexBuffer, 
             normalBuffer, 
             cli_computeNormal, 
             errorsCN);

@@ -9,16 +9,6 @@
 #include <string.h>
 #include "cli.h"
 
-
-// OpenCL includes
-#ifdef __APPLE__
-#include <OpenCL/opencl.h>
-#elif __linux
-#include <CL/cl.h>
-#else
-#error Platform not supported
-#endif
-
 #define STATUS_CHAR_SIZE 35
 
 using namespace std;
