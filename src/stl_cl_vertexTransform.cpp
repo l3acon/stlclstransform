@@ -19,7 +19,7 @@ using namespace std;
 void stlclVertexTransform(
     XformMat* transform, 
     std::vector<float> &verticies, 
-    float *vertexBuffer,
+    float *vertexBuffer, 
     CLI* cli,
     std::vector<cl_int> &errors)
 {

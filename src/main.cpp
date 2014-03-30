@@ -22,7 +22,7 @@
 
 #define CL_ERRORS 1
 
-#ifdef _WIN32
+#ifndef _WIN32
 #ifndef __APPLE__
 #define TIME 1
 #define BENCHSIZE 10
@@ -107,7 +107,7 @@ int main()
 //  int (*compar)(const void*,const void*));
 
         // Z sort
-        qsort(vertexBuffer, verticies.size(), sizeof(float)*9, vertex_comparator);
+        qsort(vertexBuffer, verticies.size() - 1, sizeof(float)*9, vertex_comparator);
 
         normalBuffer = (float*) malloc( sizeof(float) * normals.size());
         stlclComputeNormal(
