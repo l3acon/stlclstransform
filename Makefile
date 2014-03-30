@@ -5,7 +5,7 @@ SRCDIR := src
 BUILDDIR := build
 
 #these might not necessarily be right
-AMDAPPDIR :=/opt/AMDAPP
+AMDAPPDIR :=/opt/AMDAPP/include/
 NVIDIASDKDIR :=/usr/local/cuda
 INTELSDKDIR :=/usr/lib64/OpenCL/vendors/intel
 
@@ -46,7 +46,7 @@ OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 INC := -I include -I$(LIBDIR)
 
 all: $(OBJECTS)
-	@echo "$(CC) $(CFLAGS) $(LIB) $(FW) $(INC) -o build/out $(OBJECTS)"; $(CC) $(CFLAGS) $(LIB) $(FW) $(INC) -o build/out $(OBJECTS)
+	@echo "$(CC) $(CFLAGS) $(LIB) $(FW) -I /opt/AMDAPP/lib/ $(INC) -o build/out $(OBJECTS)" ; $(CC) $(CFLAGS) $(LIB) $(FW) $(INC) -o build/out $(OBJECTS)
 
 $(BUILDDIR)/%.o:	$(SRCDIR)/%.$(SRCEXT) $(ALLDEP)
 	@mkdir -p $(BUILDDIR)
