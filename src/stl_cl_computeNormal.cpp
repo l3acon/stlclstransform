@@ -27,6 +27,8 @@ void stlclComputeNormal(
     size_t vertexBytes = nVerticies * sizeof(float);
     size_t normalBytes = nVerticies * sizeof(float)/3;
 
+    printf("vb: %d, nb %d\n", vertexBytes, normalBytes);
+
     //initalize CL interface and build kernel
     // declare CL memory buffers
     cl_mem bufferA = cliKernelArgs(

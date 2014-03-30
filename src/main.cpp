@@ -64,6 +64,9 @@ int main()
         return 1;
     }
 
+    printf("nverticies: %d\nnnormals:%d\n", verticies.size(), normals.size());
+
+    // set up CLInterface resrouces
     CLI *cli_vertexTransform = (CLI*) malloc( sizeof(CLI));
     cliInitialize(cli_vertexTransform, errorsVT);
     cliBuild(
@@ -80,6 +83,7 @@ int main()
         "_kComputeNormal", 
         errorsCN);
 
+    // do the benchmark
     #if TIME
     timespec watch[BENCHSIZE], stop[BENCHSIZE];
     for (int i = 0; i < BENCHSIZE; ++i)
@@ -89,6 +93,7 @@ int main()
 
         vertexBuffer = (float*) malloc( sizeof(float) * verticies.size());
 
+        // do vertext transform
         stlclVertexTransform(
             &A, 
             verticies, 
@@ -101,17 +106,13 @@ int main()
         PrintCLIStatus(errorsVT);
         #endif
 
-// void qsort (void* base, 
-//  size_t num, 
-//  size_t size, 
-//  int (*compar)(const void*,const void*));
-
         // Z sort
         qsort(vertexBuffer, verticies.size() - 1, sizeof(float)*9, vertex_comparator);
 
+        // compute normals
         normalBuffer = (float*) malloc( sizeof(float) * normals.size());
         stlclComputeNormal(
-            normals.size(),
+            verticies.size(),
             vertexBuffer, 
             normalBuffer, 
             cli_computeNormal, 
@@ -132,10 +133,9 @@ int main()
     printf("[elapsed time] %f\n", acc/BENCHSIZE);
     #endif
 
-    
+    printf("BEFORE RELEASE\n");
     cliRelease(cli_computeNormal);
     cliRelease(cli_vertexTransform);
-
     return 0;
 }
 
