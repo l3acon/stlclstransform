@@ -60,7 +60,7 @@ const char * stl_cl_computeNormal_kernel_source  =
 "__kernel                                               "
 "\nvoid _kComputeNormal(                                "
 "\n            __global float *vi,                      "
-"\n            __global float *verto)                   "
+"\n            __global float *no)                   "
 "\n{                                                    "
 "\n                                                     "
 "\n    // Get the work-item’s unique ID                 "
@@ -77,9 +77,9 @@ const char * stl_cl_computeNormal_kernel_source  =
 " - (vi[ii+4]-vi[ii+3])*(vi[ii+2]-vi[ii+0]); "
 "\n    t[3] = t[1]+t[2]+t[3];                           "
 "\n                                                     "
-"\n    verto[io  ] = t[0]/t[3];                         "   
-"\n    verto[io+1] = t[1]/t[3];                         "  
-"\n    verto[io+2] = t[2]/t[3];                         "  
+"\n    no[io  ] = t[0]/t[3];                         "   
+"\n    no[io+1] = t[1]/t[3];                         "  
+"\n    no[io+2] = t[2]/t[3];                         "  
 "\n}                                                    "
 ;
 
