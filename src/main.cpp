@@ -20,7 +20,7 @@
 #include "cli.h"
 #include "kernels.h"
 
-#define CL_ERRORS 0
+#define CL_ERRORS 1
 
 #ifndef _WIN32
 #ifndef __APPLE__
@@ -33,7 +33,7 @@ using namespace std;
 
 int main() 
 {
-    const char* stlFile = "MiddleRioGrande_Final_OneInchSpacing.stl";
+    const char* stlFile = "Ring.stl";
 
     std::vector<float> verticies;
     std::vector<float> normals;

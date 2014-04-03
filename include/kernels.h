@@ -22,7 +22,7 @@ const char * stl_cl_vertexTransform_kernel_source  =
 "\n{                                                        "
 "\n                                                         "
 "\n    // Get the work-item’s unique ID                     "
-"\n    unsigned int i = 12*get_global_id(0);                "
+"\n    unsigned int i = 9*get_global_id(0);                "
 "\n                                                         "
 "\n    // do the matTransform                               "
 "\n                                                         "
